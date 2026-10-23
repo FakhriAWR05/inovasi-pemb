@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Misi Informatika: Info Viral</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="top">
+    <div class="wrap">
+      <p class="eyebrow">Informatika SMP Kelas VII · Dampak Sosial Informatika</p>
+      <h1>Misi: Info Viral, Benar atau Hoaks?</h1>
+      <p class="tujuan"><strong>Tujuan:</strong> Kelompokmu dapat mengenali ciri informasi yang meragukan, memeriksa kebenarannya, dan menentukan langkah sebelum membagikan informasi.</p>
+
+    </div>
+  </header>
+  <nav class="nav" aria-label="Navigasi tahap">
+    <div class="wrap">
+      <div class="steps" id="steps"></div>
+      <div class="progress" aria-label="Kemajuan misi">
+        <div class="bar"><span id="bar"></span></div>
+        <span id="progressText">0 dari 6 tahap selesai</span>
+      </div>
+    </div>
+  </nav>
+
+  <main class="wrap">
+
+    <!-- Tahap 1 -->
+    <section class="card" id="t1" data-tahap="1">
+      <h2><span class="no">1</span> Bentuk Kelompok dan Pembagian Peran</h2>
+      <p>Isi nama kelompok dan anggotanya. Peran bergilir setiap misi agar semua anggota ikut aktif.</p>
+      <label>Nama kelompok
+        <input type="text" id="namaKelompok" placeholder="Contoh: Tim Cermat">
+      </label>
+      <div class="grid2" id="anggota">
+        <label>Anggota 1 <input type="text" class="anggota" placeholder="Nama"></label>
+        <label>Anggota 2 <input type="text" class="anggota" placeholder="Nama"></label>
+        <label>Anggota 3 <input type="text" class="anggota" placeholder="Nama"></label>
+        <label>Anggota 4 <input type="text" class="anggota" placeholder="Nama"></label>
+      </div>
+      <div class="row">
+        <button class="btn" id="acakPeran">Acak peran</button>
+        <button class="btn ghost" id="putarPeran">Putar peran</button>
+      </div>
+      <ul class="peran" id="daftarPeran"></ul>
+      <details>
+        <summary>Tugas tiap peran</summary>
+        <ul>
+          <li><strong>Navigator:</strong> mengoperasikan perangkat dan membuka halaman.</li>
+          <li><strong>Pencatat:</strong> mengetik hasil diskusi.</li>
+          <li><strong>Pemeriksa Fakta:</strong> mencari dan memeriksa informasi pendukung.</li>
+          <li><strong>Juru Bicara:</strong> mempresentasikan hasil kelompok.</li>
+        </ul>
+      </details>
+      <button class="btn done" data-selesai="1">Tandai tahap 1 selesai</button>
+    </section>
+
+    <!-- Tahap 2 -->
+    <section class="card" id="t2" data-tahap="2">
+      <h2><span class="no">2</span> Baca Kasus</h2>
+      <div class="kasus">
+        <p>Sabtu pagi, grup WhatsApp kelas VII-B ramai. Seorang teman meneruskan pesan berantai:</p>
+        <div class="chat"><div class="bubble">
+          <span class="fwd">↪ Diteruskan berkali-kali</span>
+          <p><strong>"PENTING!!! Mulai besok semua siswa SMP wajib membawa kartu identitas digital. Yang tidak membawa akan dikeluarkan dari sekolah. SEBARKAN ke semua grup sebelum jam 12 siang!!!"</strong></p>
+          <small>07.42</small>
+        </div></div>
+        <p>Pesan itu tidak menyebut nama pengirim atau sumber resmi. Banyak teman langsung meneruskannya karena takut ketinggalan informasi.</p>
+      </div>
+      <p>Diskusikan bersama: apa yang kamu rasakan setelah membaca pesan ini, dan apa yang akan kamu lakukan pertama kali?</p>
+      <button class="btn done" data-selesai="2">Tandai tahap 2 selesai</button>
+    </section>
+
+    <!-- Tahap 3 -->
+    <section class="card" id="t3" data-tahap="3">
+      <h2><span class="no">3</span> Pertanyaan Pemantik</h2>
+      <p>Diskusikan, lalu Pencatat menulis jawaban kelompok. Jawaban tersimpan otomatis di perangkat ini.</p>
+      <label>1. Bagian mana dari pesan ini yang membuatmu ragu? Mengapa?
+        <textarea class="jawab" data-key="p1" rows="3"></textarea>
+      </label>
+      <label>2. Bagaimana cara kelompokmu memeriksa kebenaran pesan ini?
+        <textarea class="jawab" data-key="p2" rows="3"></textarea>
+      </label>
+      <label>3. Apa akibatnya jika pesan ini terus disebarkan?
+        <textarea class="jawab" data-key="p3" rows="3"></textarea>
+      </label>
+      <button class="btn done" data-selesai="3">Tandai tahap 3 selesai</button>
+    </section>
+
+    <!-- Tahap 4 -->
+    <section class="card" id="t4" data-tahap="4">
+      <h2><span class="no">4</span> Tantangan Interaktif</h2>
+
+      <h3>A. Pilah ciri pesan</h3>
+      <p>Untuk tiap ciri, tentukan apakah itu <em>tanda meragukan</em> atau <em>tanda cukup dapat dipercaya</em>.</p>
+      <div id="ciri"></div>
+      <div class="row">
+        <button class="btn" id="cekCiri">Periksa jawaban</button>
+        <span id="hasilCiri" class="hasil" aria-live="polite"></span>
+      </div>
+
+      <h3>B. Urutkan langkah sebelum membagikan informasi</h3>
+      <p>Susun dari langkah pertama sampai terakhir dengan tombol panah.</p>
+      <ol id="langkah" class="langkah"></ol>
+      <div class="row">
+        <button class="btn" id="cekLangkah">Periksa urutan</button>
+        <span id="hasilLangkah" class="hasil" aria-live="polite"></span>
+      </div>
+
+      <h3>C. Kuis cepat</h3>
+      <div id="kuis"></div>
+      <div class="row">
+        <button class="btn" id="cekKuis">Periksa kuis</button>
+        <span id="hasilKuis" class="hasil" aria-live="polite"></span>
+      </div>
+      <button class="btn done" data-selesai="4">Tandai tahap 4 selesai</button>
+    </section>
+
+    <!-- Tahap 5 -->
+    <section class="card" id="t5" data-tahap="5">
+      <h2><span class="no">5</span> Lembar Jawaban Kelompok</h2>
+      <p>Tulis kesimpulan kelompok, lalu salin dan tempel ke papan diskusi kelas (misalnya Padlet) yang disiapkan guru.</p>
+      <label>Solusi yang dipilih kelompok (apa yang akan kamu lakukan terhadap pesan ini)
+        <textarea class="jawab" data-key="solusi" rows="3"></textarea>
+      </label>
+      <label>Alasan memilih solusi tersebut
+        <textarea class="jawab" data-key="alasan" rows="3"></textarea>
+      </label>
+      <label>Pesan untuk teman-teman sebelum membagikan informasi
+        <textarea class="jawab" data-key="pesan" rows="2"></textarea>
+      </label>
+      <div class="row">
+        <button class="btn" id="salin">Salin hasil kelompok</button>
+        <span id="infoSalin" class="hasil" aria-live="polite"></span>
+        <button class="btn ghost exportWord" type="button">Unduh sebagai Word</button>
+      </div>
+      <textarea id="rekap" rows="8" readonly aria-label="Rekap hasil kelompok"></textarea>
+      <button class="btn done" data-selesai="5">Tandai tahap 5 selesai</button>
+    </section>
+
+    <!-- Tahap 6 -->
+    <section class="card" id="t6" data-tahap="6">
+      <h2><span class="no">6</span> Refleksi</h2>
+      <label>Apa yang paling kamu pelajari dari misi ini?
+        <textarea class="jawab" data-key="r1" rows="2"></textarea>
+      </label>
+      <label>Bagian mana yang masih membingungkan?
+        <textarea class="jawab" data-key="r2" rows="2"></textarea>
+      </label>
+      <fieldset>
+        <legend>Seberapa mudah website ini digunakan?</legend>
+        <label class="inline"><input type="radio" name="mudah" value="Sangat mudah" class="radio"> Sangat mudah</label>
+        <label class="inline"><input type="radio" name="mudah" value="Mudah" class="radio"> Mudah</label>
+        <label class="inline"><input type="radio" name="mudah" value="Cukup sulit" class="radio"> Cukup sulit</label>
+        <label class="inline"><input type="radio" name="mudah" value="Sulit" class="radio"> Sulit</label>
+      </fieldset>
+      <div class="row">
+        <button class="btn exportWord" type="button">Unduh seluruh hasil (Word)</button>
+        <span class="hasil infoExport" aria-live="polite"></span>
+      </div>
+      <button class="btn done" data-selesai="6">Tandai tahap 6 selesai</button>
+      <p id="selesaiSemua" class="selamat" hidden>Misi selesai! Siapkan Juru Bicara untuk presentasi.</p>
+    </section>
+
+  </main>
+
+  <footer class="wrap foot">
+    <button class="btn ghost" id="reset">Mulai ulang (hapus data di perangkat ini)</button>
+    <p>Data hanya tersimpan di perangkat ini dan tidak dikirim ke mana pun.</p>
+  </footer>
+
+  <script src="script.js"></script>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
