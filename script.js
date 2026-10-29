@@ -5,7 +5,7 @@
   var TOTAL = 6;
 
   // ---------- Penyimpanan (aman jika storage diblokir) ----------
-  var state = { jawab: {}, selesai: {}, anggota: [], peran: [], offset: 0, mudah: "", ciri: {}, langkah: null, kuis: {} };
+  var state = { jawab: {}, selesai: {}, anggota: [], peran: [], offset: 0, mudah: "", ciri: {}, langkah: null, kuis: {}, kunci: {} };
 
   function simpan() {
     try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {}
@@ -43,21 +43,33 @@
   var KUIS = [
     {
       q: "Pesan berantai menyuruhmu menyebarkan secepatnya. Apa yang sebaiknya dilakukan pertama kali?",
-      o: ["Segera meneruskan ke semua grup", "Memeriksa sumber dan kebenarannya", "Mengabaikan semua pesan di grup"],
+      o: ["Segera meneruskan ke semua grup", "Memeriksa sumber dan kebenarannya", "Mengabaikan semua pesan di grup", "Menambah komentar lalu menyebarkannya"],
       a: 1,
       u: "Memeriksa dulu mencegah kita ikut menyebarkan informasi yang keliru."
     },
     {
       q: "Mana sumber yang paling tepat untuk memeriksa pengumuman sekolah?",
-      o: ["Pesan teruskan dari teman", "Akun atau situs resmi sekolah serta guru", "Tebakan berdasarkan perasaan"],
-      a: 1,
+      o: ["Pesan teruskan dari teman", "Tebakan berdasarkan perasaan", "Akun atau situs resmi sekolah serta guru", "Unggahan tanpa nama yang banyak dibagikan"],
+      a: 2,
       u: "Sumber resmi dapat dipertanggungjawabkan."
     },
     {
       q: "Dampak apa yang dapat muncul jika hoaks terus disebarkan?",
-      o: ["Orang menjadi cemas dan salah mengambil keputusan", "Tidak ada dampak apa pun", "Semua orang menjadi lebih pintar"],
+      o: ["Orang menjadi cemas dan salah mengambil keputusan", "Tidak ada dampak apa pun", "Semua orang menjadi lebih pintar", "Hoaks otomatis menjadi benar"],
       a: 0,
       u: "Informasi keliru dapat menimbulkan kecemasan dan keputusan yang salah."
+    },
+    {
+      q: "Beredar pesan viral berjudul \"Heboh! Minum air garam menyembuhkan semua penyakit\". Tindakan paling tepat?",
+      o: ["Meneruskan agar keluarga ikut tahu", "Mencobanya dulu untuk membuktikan", "Percaya karena banyak yang membagikan", "Mencari kebenarannya di situs kesehatan resmi atau pemeriksa fakta"],
+      a: 3,
+      u: "Klaim kesehatan harus dicek ke sumber resmi. Banyaknya pembagian bukan bukti kebenaran."
+    },
+    {
+      q: "Mengapa pesan hoaks sering memakai kalimat yang menakutkan atau mendesak?",
+      o: ["Agar pesan mudah dilupakan", "Agar pembaca panik dan cepat menyebarkan tanpa berpikir", "Agar pesan terlihat lebih sopan", "Agar pembaca punya waktu memeriksanya"],
+      a: 1,
+      u: "Rasa takut dan terburu-buru membuat orang lupa memeriksa kebenaran."
     }
   ];
 
@@ -72,6 +84,7 @@
       c.classList.toggle("selesai", !!state.selesai[c.getAttribute("data-tahap")]);
     });
     $("#selesaiSemua").hidden = n < TOTAL;
+    $("#unduhPdf").hidden = n < TOTAL;
   }
 
   function aturTombolSelesai() {
@@ -210,7 +223,11 @@
       d.appendChild(s); d.appendChild(sel);
       wadah.appendChild(d);
     });
-    $("#cekCiri").addEventListener("click", function () {
+    function kunciCiri() {
+      $$("#ciri select").forEach(function (s) { s.disabled = true; });
+      $("#cekCiri").disabled = true;
+    }
+    function periksaCiri() {
       var benar = 0, kosong = 0;
       CIRI.forEach(function (c, i) {
         var d = $("#ciri" + i), v = $("select", d).value;
@@ -221,7 +238,11 @@
       if (kosong) { h.textContent = "Jawab semua ciri dulu."; h.className = "hasil bad"; return; }
       h.textContent = benar + " dari " + CIRI.length + " tepat." + (benar === CIRI.length ? " Bagus!" : " Coba perbaiki yang merah.");
       h.className = "hasil " + (benar === CIRI.length ? "ok" : "bad");
-    });
+      h.textContent += " Jawaban dikunci.";
+      state.kunci.ciri = true; simpan(); kunciCiri();
+    }
+    $("#cekCiri").addEventListener("click", periksaCiri);
+    if (state.kunci.ciri) periksaCiri();
   }
 
   // ---------- Tantangan B: urutan ----------
@@ -234,7 +255,7 @@
       state.langkah = urut;
     }
     gambarLangkah();
-    $("#cekLangkah").addEventListener("click", function () {
+    function periksaLangkah() {
       var benar = 0;
       $$("#langkah li").forEach(function (li, pos) {
         var idx = state.langkah[pos];
@@ -243,8 +264,13 @@
       var h = $("#hasilLangkah");
       h.textContent = benar + " dari " + LANGKAH.length + " langkah di tempat yang tepat.";
       h.className = "hasil " + (benar === LANGKAH.length ? "ok" : "bad");
-      simpan();
-    });
+      h.textContent += " Jawaban dikunci.";
+      state.kunci.langkah = true; simpan();
+      $$("#langkah button").forEach(function (b) { b.disabled = true; });
+      $("#cekLangkah").disabled = true;
+    }
+    $("#cekLangkah").addEventListener("click", periksaLangkah);
+    if (state.kunci.langkah) periksaLangkah();
   }
 
   function gambarLangkah() {
@@ -257,12 +283,12 @@
       var naik = document.createElement("button");
       naik.className = "btn ghost small"; naik.type = "button";
       naik.textContent = "Naik"; naik.setAttribute("aria-label", "Naikkan: " + LANGKAH[idx]);
-      naik.disabled = pos === 0;
+      naik.disabled = pos === 0 || !!state.kunci.langkah;
       naik.addEventListener("click", function () { tukar(pos, pos - 1); });
       var turun = document.createElement("button");
       turun.className = "btn ghost small"; turun.type = "button";
       turun.textContent = "Turun"; turun.setAttribute("aria-label", "Turunkan: " + LANGKAH[idx]);
-      turun.disabled = pos === state.langkah.length - 1;
+      turun.disabled = pos === state.langkah.length - 1 || !!state.kunci.langkah;
       turun.addEventListener("click", function () { tukar(pos, pos + 1); });
       li.appendChild(s); li.appendChild(naik); li.appendChild(turun);
       ol.appendChild(li);
@@ -270,6 +296,7 @@
   }
 
   function tukar(a, b) {
+    if (state.kunci.langkah) return;
     var t = state.langkah[a]; state.langkah[a] = state.langkah[b]; state.langkah[b] = t;
     simpan(); gambarLangkah();
     $("#hasilLangkah").textContent = "";
@@ -297,7 +324,7 @@
       });
       w.appendChild(d);
     });
-    $("#cekKuis").addEventListener("click", function () {
+    function periksaKuis() {
       var benar = 0, kosong = 0;
       KUIS.forEach(function (s, i) {
         var d = $("#soal" + i);
@@ -315,7 +342,14 @@
       if (kosong) { h.textContent = "Jawab semua soal dulu."; h.className = "hasil bad"; return; }
       h.textContent = "Skor: " + benar + " dari " + KUIS.length;
       h.className = "hasil " + (benar === KUIS.length ? "ok" : "bad");
-    });
+      h.textContent += ". Jawaban dikunci.";
+      state.kunci.kuis = true; simpan();
+      $$("#kuis input").forEach(function (r) { r.disabled = true; });
+      $$("#kuis label.opsi").forEach(function (l) { l.classList.add("terkunci"); });
+      $("#cekKuis").disabled = true;
+    }
+    $("#cekKuis").addEventListener("click", periksaKuis);
+    if (state.kunci.kuis) periksaKuis();
   }
 
   // ---------- Ekspor ke Word ----------
@@ -352,26 +386,54 @@
     h += "<p><b>2. Bagaimana cara kelompokmu memeriksa kebenaran pesan ini?</b><br>" + isi(state.jawab.p2) + "</p>";
     h += "<p><b>3. Apa akibatnya jika pesan ini terus disebarkan?</b><br>" + isi(state.jawab.p3) + "</p>";
 
-    h += "<h2>3. Hasil Tantangan Interaktif</h2>";
-    h += "<p><b>A. Pilah ciri pesan</b></p><table><tr><th>Ciri</th><th>Penilaian kelompok</th></tr>";
+    // --- Penilaian tantangan
+    var HURUF = ["A", "B", "C", "D"];
+    var bCiri = 0, bLang = 0, bKuis = 0;
+    CIRI.forEach(function (c, i) { if (state.ciri[i] === c.j) bCiri++; });
+    LANGKAH.forEach(function (_, pos) { if (state.langkah && state.langkah[pos] === pos) bLang++; });
+    KUIS.forEach(function (s, i) { if (state.kuis[i] === s.a) bKuis++; });
+    function nilai(b, n) { return Math.round(b / n * 100); }
+    var nA = nilai(bCiri, CIRI.length), nB = nilai(bLang, LANGKAH.length), nC = nilai(bKuis, KUIS.length);
+    var rata = Math.round((nA + nB + nC) / 3);
+
+    h += "<h2>3. Hasil dan Nilai Tantangan Interaktif</h2>";
+    h += "<table class='nilai'><tr><th>Tantangan</th><th>Benar</th><th>Nilai (0–100)</th></tr>";
+    h += "<tr><td>A. Pilah ciri pesan</td><td>" + bCiri + " dari " + CIRI.length + "</td><td>" + nA + "</td></tr>";
+    h += "<tr><td>B. Urutkan langkah</td><td>" + bLang + " dari " + LANGKAH.length + "</td><td>" + nB + "</td></tr>";
+    h += "<tr><td>C. Kuis cepat</td><td>" + bKuis + " dari " + KUIS.length + "</td><td>" + nC + "</td></tr>";
+    h += "<tr><th>Nilai rata-rata</th><th></th><th>" + rata + "</th></tr></table>";
+
+    h += "<p><b>A. Pilah ciri pesan</b></p><table><tr><th>Ciri</th><th>Jawaban kelompok</th><th>Kunci</th><th>Hasil</th></tr>";
+    function namaCiri(v) { return v === "ragu" ? "Meragukan" : v === "percaya" ? "Cukup dapat dipercaya" : "(belum dijawab)"; }
     CIRI.forEach(function (c, i) {
-      var v = state.ciri[i];
-      var teks = v === "ragu" ? "Meragukan" : v === "percaya" ? "Cukup dapat dipercaya" : "(belum dijawab)";
-      h += "<tr><td>" + esc(c.t) + "</td><td>" + esc(teks) + "</td></tr>";
+      var ok = state.ciri[i] === c.j;
+      h += "<tr><td>" + esc(c.t) + "</td><td>" + esc(namaCiri(state.ciri[i])) + "</td><td>" + esc(namaCiri(c.j)) +
+        "</td><td class='" + (ok ? "ok" : "no2") + "'>" + (ok ? "Benar" : "Salah") + "</td></tr>";
     });
     h += "</table>";
 
-    h += "<p><b>B. Urutan langkah sebelum membagikan informasi (susunan kelompok)</b></p><ol>";
-    (state.langkah || LANGKAH.map(function (_, i) { return i; })).forEach(function (idx) {
-      h += "<li>" + esc(LANGKAH[idx]) + "</li>";
+    h += "<p><b>B. Urutan langkah sebelum membagikan informasi</b></p><table><tr><th>No</th><th>Susunan kelompok</th><th>Hasil</th></tr>";
+    LANGKAH.forEach(function (_, pos) {
+      var idx = state.langkah ? state.langkah[pos] : null;
+      var ok = idx === pos;
+      h += "<tr><td>" + (pos + 1) + "</td><td>" + (idx === null ? "<i>(belum diurutkan)</i>" : esc(LANGKAH[idx])) +
+        "</td><td class='" + (ok ? "ok" : "no2") + "'>" + (ok ? "Benar" : "Salah") + "</td></tr>";
     });
+    h += "</table><p><b>Urutan yang benar:</b></p><ol>";
+    LANGKAH.forEach(function (t) { h += "<li>" + esc(t) + "</li>"; });
     h += "</ol>";
 
-    var skor = 0, dijawab = 0;
+    h += "<p><b>C. Kuis cepat</b> (nilai " + nC + ")</p>";
     KUIS.forEach(function (s, i) {
-      if (typeof state.kuis[i] === "number") { dijawab++; if (state.kuis[i] === s.a) skor++; }
+      var jw = state.kuis[i], ok = jw === s.a;
+      h += "<div class='soal-p'><p><b>" + (i + 1) + ". " + esc(s.q) + "</b></p>";
+      s.o.forEach(function (t, k) {
+        var tanda = (k === jw ? " ← jawaban kelompok" : "") + (k === s.a ? " ✓ kunci" : "");
+        h += "<p class='opsi-p'>" + HURUF[k] + ". " + esc(t) + (tanda ? "<i>" + tanda + "</i>" : "") + "</p>";
+      });
+      h += "<p class='opsi-p'>Hasil: <span class='" + (ok ? "ok" : "no2") + "'>" +
+        (typeof jw !== "number" ? "Belum dijawab" : ok ? "Benar" : "Salah") + "</span>. Pembahasan: " + esc(s.u) + "</p></div>";
     });
-    h += "<p><b>C. Kuis cepat:</b> " + (dijawab ? skor + " dari " + KUIS.length + " benar" : "belum dikerjakan") + "</p>";
 
     h += "<h2>4. Lembar Jawaban Kelompok</h2>";
     h += "<p><b>Solusi yang dipilih kelompok</b><br>" + isi(state.jawab.solusi) + "</p>";
@@ -401,26 +463,55 @@
     return "Hasil-Misi-Info-Viral-" + slug + ".doc";
   }
 
-  function mulaiExport() {
-    $$(".exportWord").forEach(function (btn) {
-      btn.addEventListener("click", function () {
-        var info = $$(".infoExport")[0];
-        try {
-          var blob = new Blob(["﻿", bangunDokumen()], { type: "application/msword;charset=utf-8" });
-          var url = URL.createObjectURL(blob);
-          var a = document.createElement("a");
-          a.href = url;
-          a.download = namaBerkas();
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-          setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
-          if (info) { info.textContent = "Berkas diunduh: " + namaBerkas(); info.className = "hasil infoExport ok"; }
-        } catch (e) {
-          if (info) { info.textContent = "Gagal membuat berkas. Gunakan tombol Salin hasil kelompok."; info.className = "hasil infoExport bad"; }
-        }
-      });
+  // ---------- Unduh PDF (lewat dialog cetak browser) ----------
+  function mulaiPdf() {
+    var judulAsli = document.title;
+    function bersihkan() {
+      document.body.classList.remove("cetak-pdf");
+      $("#cetak").innerHTML = "";
+      document.title = judulAsli;
+    }
+    window.addEventListener("afterprint", bersihkan);
+    $("#btnPdf").addEventListener("click", function () {
+      var sem = Object.keys(state.selesai).filter(function (k) { return state.selesai[k]; }).length;
+      if (sem < TOTAL) return;
+      var html = bangunDokumen();
+      var isiBody = html.substring(html.indexOf("<body>") + 6, html.lastIndexOf("</body>"));
+      $("#cetak").innerHTML = isiBody;
+      document.title = namaBerkas().replace(/\.doc$/, "");
+      document.body.classList.add("cetak-pdf");
+      var info = $("#infoPdf");
+      info.textContent = "Pada jendela cetak, pilih tujuan \"Simpan sebagai PDF\".";
+      info.className = "hasil ok";
+      setTimeout(function () { window.print(); }, 100);
     });
+  }
+
+  // ---------- Tema: otomatis / terang / gelap ----------
+  function mulaiTema() {
+    var KT = "tema-misi", MODE = ["auto", "terang", "gelap"];
+    var NAMA = { auto: "Otomatis", terang: "Terang", gelap: "Gelap" };
+    var IKON = { auto: "🌓", terang: "☀️", gelap: "🌙" };
+    var btn = $("#tema"), mode = "auto";
+    try { var s = localStorage.getItem(KT); if (MODE.indexOf(s) > -1) mode = s; } catch (e) {}
+    function terapkan() {
+      if (mode === "auto") document.documentElement.removeAttribute("data-tema");
+      else document.documentElement.setAttribute("data-tema", mode);
+      $(".ti", btn).textContent = IKON[mode];
+      $(".tl", btn).textContent = NAMA[mode];
+      btn.setAttribute("aria-label", "Tema: " + NAMA[mode] + ". Tekan untuk mengganti.");
+      btn.title = "Tema: " + NAMA[mode];
+    }
+    btn.addEventListener("click", function () {
+      mode = MODE[(MODE.indexOf(mode) + 1) % MODE.length];
+      try { if (mode === "auto") localStorage.removeItem(KT); else localStorage.setItem(KT, mode); } catch (e) {}
+      terapkan();
+      var t = $("#toast");
+      t.textContent = "Tema: " + NAMA[mode] + (mode === "auto" ? " (mengikuti perangkat)" : "");
+      t.classList.add("show");
+      clearTimeout(btn._t); btn._t = setTimeout(function () { t.classList.remove("show"); }, 1800);
+    });
+    terapkan();
   }
 
   // ---------- Reset ----------
@@ -477,9 +568,10 @@
   mulaiLangkah();
   mulaiKuis();
   mulaiSalin();
-  mulaiExport();
   mulaiReset();
   mulaiNav();
+  mulaiTema();
+  mulaiPdf();
   updateRekap();
   hitungProgres();
 })();

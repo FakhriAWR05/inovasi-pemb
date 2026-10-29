@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Misi Informatika: Info Viral</title>
+  <meta name="color-scheme" content="light dark">
+  <script>try{var t=localStorage.getItem("tema-misi");if(t==="terang"||t==="gelap")document.documentElement.setAttribute("data-tema",t)}catch(e){}</script>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -22,6 +24,7 @@
         <div class="bar"><span id="bar"></span></div>
         <span id="progressText">0 dari 6 tahap selesai</span>
       </div>
+      <button class="tema" id="tema" type="button"><span class="ti" aria-hidden="true">🌓</span><span class="tl">Otomatis</span></button>
     </div>
   </nav>
 
@@ -134,7 +137,6 @@
       <div class="row">
         <button class="btn" id="salin">Salin hasil kelompok</button>
         <span id="infoSalin" class="hasil" aria-live="polite"></span>
-        <button class="btn ghost exportWord" type="button">Unduh sebagai Word</button>
       </div>
       <textarea id="rekap" rows="8" readonly aria-label="Rekap hasil kelompok"></textarea>
       <button class="btn done" data-selesai="5">Tandai tahap 5 selesai</button>
@@ -156,12 +158,12 @@
         <label class="inline"><input type="radio" name="mudah" value="Cukup sulit" class="radio"> Cukup sulit</label>
         <label class="inline"><input type="radio" name="mudah" value="Sulit" class="radio"> Sulit</label>
       </fieldset>
-      <div class="row">
-        <button class="btn exportWord" type="button">Unduh seluruh hasil (Word)</button>
-        <span class="hasil infoExport" aria-live="polite"></span>
-      </div>
       <button class="btn done" data-selesai="6">Tandai tahap 6 selesai</button>
       <p id="selesaiSemua" class="selamat" hidden>Misi selesai! Siapkan Juru Bicara untuk presentasi.</p>
+      <div id="unduhPdf" class="row" hidden>
+        <button class="btn" id="btnPdf" type="button">Unduh hasil sebagai PDF</button>
+        <span class="hasil" id="infoPdf" aria-live="polite"></span>
+      </div>
     </section>
 
   </main>
@@ -172,6 +174,7 @@
   </footer>
 
   <script src="script.js"></script>
+  <div id="cetak" aria-hidden="true"></div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 </body>
 </html>
