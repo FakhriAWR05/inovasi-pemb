@@ -5,7 +5,7 @@
   var TOTAL = 6;
 
   // ---------- Penyimpanan (aman jika storage diblokir) ----------
-  var state = { jawab: {}, selesai: {}, anggota: [], peran: [], offset: 0, mudah: "", ciri: {}, langkah: null, kuis: {}, kunci: {} };
+  var state = { jawab: {}, selesai: {}, anggota: [], peran: [], offset: 0, ciri: {}, langkah: null, kuis: {}, kunci: {} };
 
   function simpan() {
     try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {}
@@ -166,10 +166,6 @@
         simpan();
         updateRekap();
       });
-    });
-    $$(".radio").forEach(function (r) {
-      if (state.mudah === r.value) r.checked = true;
-      r.addEventListener("change", function () { state.mudah = r.value; simpan(); });
     });
   }
 
@@ -443,7 +439,6 @@
     h += "<h2>5. Refleksi</h2>";
     h += "<p><b>Hal yang paling dipelajari</b><br>" + isi(state.jawab.r1) + "</p>";
     h += "<p><b>Bagian yang masih membingungkan</b><br>" + isi(state.jawab.r2) + "</p>";
-    h += "<p><b>Kemudahan penggunaan website</b><br>" + isi(state.mudah) + "</p>";
 
     return "<html xmlns:o='urn:schemas-microsoft-com:office:office' " +
       "xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>" +
